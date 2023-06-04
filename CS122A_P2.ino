@@ -104,11 +104,15 @@ void TickFct_MotionSM(int MotionSM_State){
 }
 
 void setup() {
-  
   Serial.begin(9600); //for serial debugging
   pinMode(A0, INPUT); //for microphone
+  pinMode(7, INPUT_PULLUP); //for button
+  pinMode(8, OUTPUT); //for buzzer
   pinMode(9, OUTPUT); //for LED
-  pinMode(10, INPUT); //for PIR Motion Sensor
+  pinMode(10, INPUT_PULLUP); //for PIR Motion Sensor
+  //NOTE: Pullup resistors NEEDED for breakbeam to work!
+  pinMode(11, INPUT_PULLUP); //for breakbeam sensor 1
+  pinMode(12, INPUT_PULLUP); //for breakbeam sensor 2
   digitalWrite(9, LOW);
   
   LCD.begin(); //LCD Setup
@@ -118,5 +122,11 @@ void setup() {
 }
 
 void loop() {
-
+  // if(digitalRead(11) == LOW){
+  //   Serial.println("BB1 Broken!");
+  // }
+  // if(digitalRead(12) == LOW){
+  //   Serial.println("BB2 Broken!");
+  // }
+  delay(500);
 }
