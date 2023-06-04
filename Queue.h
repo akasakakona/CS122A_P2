@@ -45,6 +45,9 @@ private:
     struct Node {
         T data;
         Node* next;
+        Node(const int& data){
+          this->data = data;
+        }
     };
     Node* front;
     Node* back;
