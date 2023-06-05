@@ -24,7 +24,7 @@ Queue<int> msgQRPi;
 //Task Scheduler Data Structure
 task tasks[7];
 const unsigned short tasksNum = 7;
-const unsigned long tasksPeriodGCD = 50;
+const unsigned long tasksPeriodGCD = 5;
 
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
@@ -62,13 +62,13 @@ void setup() {
   //initialize tasks
   unsigned char i = 0;
   tasks[i].state = MicSM_Start;
-  tasks[i].period = 100;
+  tasks[i].period = 5;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_MicSM;
 
   i++;
   tasks[i].state = NotifSM_Start;
-  tasks[i].period = 500;
+  tasks[i].period = 100;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_NotifSM;
 
@@ -86,7 +86,7 @@ void setup() {
 
   i++;
   tasks[i].state = MotionSM_Start;
-  tasks[i].period = 500;
+  tasks[i].period = 1000;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_MotionSM;
 
@@ -98,7 +98,7 @@ void setup() {
 
   i++;
   tasks[i].state = BBSM_Start;
-  tasks[i].period = 100;
+  tasks[i].period = 50;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_BBSM;
 
@@ -114,6 +114,8 @@ void loop() {
     }
     tasks[i].elapsedTime += tasksPeriodGCD;
   }
+  while(!TimerFlag);
+  TimerFlag = 0;
 }
 
 int TickFct_MicSM(int MicSM_State){
@@ -130,7 +132,7 @@ int TickFct_MicSM(int MicSM_State){
       i = 0;
       break;
     case MicSM_Detection:
-      if(i >= 1000){
+      if(i >= 20){
         MicSM_State = MicSM_SetResult;
         break;
       }else{
@@ -160,7 +162,8 @@ int TickFct_MicSM(int MicSM_State){
     case MicSM_SetResult:
       noise = ((maxNoise - minNoise) * 5) / 1024;
       // Serial.println("Noise: " + String(noise));
-      if(noise > 2){
+      if(noise){
+        Serial.println("Noise Detected!");
         isNoise = true;
       }
       break;
@@ -196,6 +199,7 @@ int TickFct_NotifSM(int NotifSM_State){
       break;
     case NotifSM_Sound:
       if(digitalRead(7) == HIGH){
+        // Serial.println("Button pressed!");
         noTone(8);
         isNoise = false;
         LCD.clear();
@@ -221,8 +225,10 @@ int TickFct_NotifSM(int NotifSM_State){
     case NotifSM_Sound:
       ringBuzzer = !ringBuzzer;
       if(ringBuzzer){
+        // Serial.println("Buzzer on!");
         tone(8, 1000);
       }else{
+        // Serial.println("Buzzer off!");
         noTone(8);
       }
       break;
@@ -319,6 +325,7 @@ int TickFct_MotionSM(int MotionSM_State){
       break;
     case MotionSM_Detection:
       if(digitalRead(10) == HIGH){
+        Serial.println("Motion Detected!");
         isMotion = true;
         MotionSM_State = MotionSM_SetResult;
       }else{
@@ -400,7 +407,6 @@ int TickFct_BBSM(int BBSM_State){
       }
       break;
     case BBSM_BB2_: //BB2 is triggered first
-      Serial.println("In BBSM_BB2_");
       if(digitalRead(11) == HIGH){
         BBSM_State = BBSM_BB2_;
       }else{
