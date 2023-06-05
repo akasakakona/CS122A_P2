@@ -53,16 +53,16 @@ void setup() {
   pinMode(11, INPUT_PULLUP); //for breakbeam sensor 1
   pinMode(12, INPUT_PULLUP); //for breakbeam sensor 2
   digitalWrite(9, LOW); //turn off LED
-  
+   
   LCD.begin(); //LCD Setup
   LCD.setBacklight(HIGH);
-  LCD.setCursor(0, 0);
-  LCD.print("Hello World!");
+  LCD.clear();
+  LCD.print("Occupancy: " + String(occupancy));
 
   //initialize tasks
   unsigned char i = 0;
   tasks[i].state = MicSM_Start;
-  tasks[i].period = 50;
+  tasks[i].period = 100;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_MicSM;
 
@@ -117,9 +117,11 @@ void loop() {
 }
 
 int TickFct_MicSM(int MicSM_State){
+  // Serial.println("MicSM_State: " + String(MicSM_State));
   static unsigned int maxNoise;
   static unsigned int minNoise;
   static unsigned i;
+  unsigned int sample, noise;
   switch(MicSM_State){
     case MicSM_Start:
       MicSM_State = MicSM_Detection;
@@ -128,8 +130,9 @@ int TickFct_MicSM(int MicSM_State){
       i = 0;
       break;
     case MicSM_Detection:
-      if(i >= 50){
+      if(i >= 500){
         MicSM_State = MicSM_SetResult;
+        break;
       }else{
         MicSM_State = MicSM_Detection;
       }
@@ -138,6 +141,7 @@ int TickFct_MicSM(int MicSM_State){
       MicSM_State = MicSM_Detection;
       maxNoise = 0;
       minNoise = 1024;
+      i = 0;
       break;
     default:
       MicSM_State = MicSM_Start;
@@ -145,7 +149,7 @@ int TickFct_MicSM(int MicSM_State){
   }
   switch(MicSM_State){
     case MicSM_Detection:
-      unsigned int sample = analogRead(A0);
+      sample = analogRead(A0);
       if(sample > maxNoise){
         maxNoise = sample;
       }else if(sample < minNoise){
@@ -154,10 +158,13 @@ int TickFct_MicSM(int MicSM_State){
       i++;
       break;
     case MicSM_SetResult:
-      unsigned int noise = ((maxNoise - minNoise) * 5) / 1024;
+      noise = ((maxNoise - minNoise) * 5) / 1024;
+      Serial.println("Noise: " + String(noise));
       if(noise){
         isNoise = true;
       }
+      break;
+    default:
       break;
   }
   return MicSM_State;
@@ -207,6 +214,7 @@ int TickFct_NotifSM(int NotifSM_State){
         NotifSM_State = NotifSM_Sound;
       }else{
         i = 0;
+        noTone(8);
         NotifSM_State = NotifSM_Start;
       }
       break;
@@ -222,6 +230,8 @@ int TickFct_NotifSM(int NotifSM_State){
       ringBuzzer = !ringBuzzer;
       if(ringBuzzer){
         tone(8, 1000);
+      }else{
+        noTone(8);
       }
       i++;
       break;
@@ -378,8 +388,10 @@ int TickFct_BBSM(int BBSM_State){
       break;
     case BBSM_BB1:
       if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
+        Serial.println("BB1 triggered!");
         BBSM_State = BBSM_BB1;
       }else if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
+        Serial.println("BB2 triggered!");
         msgQ.enqueue(1);
         BBSM_State = BBSM_BB2;
       }else{
@@ -388,9 +400,11 @@ int TickFct_BBSM(int BBSM_State){
       break;
     case BBSM_BB2:
       if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
+        Serial.println("BB2 triggered!");
         BBSM_State = BBSM_BB2;
       }else if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
         msgQ.enqueue(-1);
+        Serial.println("BB1 triggered!");
         BBSM_State = BBSM_BB1;
       }else{
         BBSM_State = BBSM_Start;
@@ -404,3 +418,10 @@ int TickFct_BBSM(int BBSM_State){
   //since nothing is done within the states
   return BBSM_State;
 }
+
+/****
+ * TODO:
+ * 1. Fix BBSM. The logic is wrong
+ * 2. Stop buzzer when max occupancy is no longer reached
+ * 3. Investigate why microphone is not working
+*/
