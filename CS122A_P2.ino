@@ -28,11 +28,11 @@ const unsigned long tasksPeriodGCD = 50;
 
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
-enum NotifSM_States {NotifSM_Start, NotifSM_Wait, NotifSM_Sound};
+enum NotifSM_States {NotifSM_Start, NotifSM_Sound};
 enum RPiSM_States {RPiSM_Start};
 enum OccupancySM_States {OccupancySM_Start, OccupancySM_Update};
 enum LEDSM_States {LEDSM_Start};
-enum BBSM_States {BBSM_Start, BBSM_BB1, BBSM_BB2};
+enum BBSM_States {BBSM_Start, BBSM_BB1, BBSM_BB2, BBSM_BB1_, BBSM_BB2_};
 
 int TickFct_MicSM(int MicSM_State); //DONE! Waiting for testing
 int TickFct_NotifSM(int NotifSM_State); //DONE! Waiting for testing
@@ -130,7 +130,7 @@ int TickFct_MicSM(int MicSM_State){
       i = 0;
       break;
     case MicSM_Detection:
-      if(i >= 500){
+      if(i >= 1000){
         MicSM_State = MicSM_SetResult;
         break;
       }else{
@@ -159,7 +159,7 @@ int TickFct_MicSM(int MicSM_State){
       break;
     case MicSM_SetResult:
       noise = ((maxNoise - minNoise) * 5) / 1024;
-      Serial.println("Noise: " + String(noise));
+      // Serial.println("Noise: " + String(noise));
       if(noise){
         isNoise = true;
       }
@@ -183,7 +183,7 @@ int TickFct_NotifSM(int NotifSM_State){
         LCD.setCursor(0, 1);
         LCD.print("Push btn to stop");
         LCD.setCursor(0, 0);
-        NotifSM_State = NotifSM_Wait;
+        NotifSM_State = NotifSM_Sound;
       }else if(isMaxOccu){
         i = 0;
         LCD.clear();
@@ -194,27 +194,14 @@ int TickFct_NotifSM(int NotifSM_State){
         NotifSM_State = NotifSM_Start;
       }
       break;
-    case NotifSM_Wait:
-      if(digitalRead(7) == LOW && i < 50){
-        NotifSM_State = NotifSM_Wait;
-      }
-      else if(digitalRead(7) == LOW && i >= 50){
-        i = 0;
-        ringBuzzer = false;
-        NotifSM_State = NotifSM_Sound;
-      }
-      if(digitalRead(7) == HIGH){
-        i = 0;
-        isNoise = false;
-        NotifSM_State = NotifSM_Start;
-      }
-      break;
     case NotifSM_Sound:
       if(i < 50){
         NotifSM_State = NotifSM_Sound;
-      }else{
+      }
+      if((digitalRead(7) == HIGH || i >= 50) && !isMaxOccu){
         i = 0;
         noTone(8);
+        isNoise = false;
         NotifSM_State = NotifSM_Start;
       }
       break;
@@ -223,9 +210,6 @@ int TickFct_NotifSM(int NotifSM_State){
       break;
   }
   switch(NotifSM_State){
-    case NotifSM_Wait:
-      i++;
-      break;
     case NotifSM_Sound:
       ringBuzzer = !ringBuzzer;
       if(ringBuzzer){
@@ -379,33 +363,43 @@ int TickFct_BBSM(int BBSM_State){
   switch (BBSM_State){
     case BBSM_Start:
       if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
+        Serial.println("BB1 triggered!_BBSM_Start");
         BBSM_State = BBSM_BB1;
       }else if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
-        BBSM_State = BBSM_BB2;
+        Serial.println("BB2 triggered!_BBSM_Start");
+        BBSM_State = BBSM_BB2_;
       }else{
         BBSM_State = BBSM_Start;
       }
       break;
-    case BBSM_BB1:
-      if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
-        Serial.println("BB1 triggered!");
+    case BBSM_BB1: //BB1 is triggered first
+      if(digitalRead(12) == HIGH){
         BBSM_State = BBSM_BB1;
-      }else if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
-        Serial.println("BB2 triggered!");
+      }else{
+        Serial.println("BB2 triggered!_BBSM_BB1");
         msgQ.enqueue(1);
         BBSM_State = BBSM_BB2;
-      }else{
-        BBSM_State = BBSM_Start;
       }
       break;
     case BBSM_BB2:
-      if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
-        Serial.println("BB2 triggered!");
+      if(digitalRead(12) == LOW){
         BBSM_State = BBSM_BB2;
-      }else if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
+      }else{
+        BBSM_State = BBSM_Start;
+      }
+      break;
+    case BBSM_BB2_: //BB2 is triggered first
+      Serial.println("In BBSM_BB2_");
+      if(digitalRead(11) == HIGH){
+        BBSM_State = BBSM_BB2_;
+      }else{
         msgQ.enqueue(-1);
-        Serial.println("BB1 triggered!");
-        BBSM_State = BBSM_BB1;
+        BBSM_State = BBSM_BB1_;
+      }
+      break;
+    case BBSM_BB1_:
+      if(digitalRead(11) == LOW){
+        BBSM_State = BBSM_BB1_;
       }else{
         BBSM_State = BBSM_Start;
       }
@@ -421,7 +415,6 @@ int TickFct_BBSM(int BBSM_State){
 
 /****
  * TODO:
- * 1. Fix BBSM. The logic is wrong
  * 2. Stop buzzer when max occupancy is no longer reached
  * 3. Investigate why microphone is not working
 */
