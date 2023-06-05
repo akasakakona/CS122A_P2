@@ -10,7 +10,7 @@ public:
         clear();
     }
     void enqueue(T data){
-        if(isEmpty()){
+        if(empty()){
             front = new Node(data);
             back = front;
         }else{
@@ -20,7 +20,7 @@ public:
         length++;
     }
     T dequeue(){
-        if(isEmpty()){
+        if(empty()){
             return T();
         }
         Node* temp = front;
@@ -30,14 +30,14 @@ public:
         length--;
         return data;
     }
-    bool isEmpty(){
+    bool empty(){
         return length == 0;
     }
     int size(){
         return length;
     }
     void clear(){
-        while(!isEmpty()){
+        while(!empty()){
             dequeue();
         }
     }

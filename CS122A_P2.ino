@@ -25,6 +25,9 @@ enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
 enum NotifSM_States {NotifSM_Start, NotifSM_Wait, NotifSM_Sound};
 enum RPiSM_States {RPiSM_Start};
+enum OccupancySM_States {OccupancySM_Start, OccupancySM_Update};
+enum LEDSM_States {LEDSM_Start};
+enum BBSM_States {BBSM_Start, BBSM_BB1, BBSM_BB2};
 
 int TickFct_MicSM(int MicSM_State); //DONE! Waiting for testing
 int TickFct_NotifSM(int NotifSM_State); //DONE! Waiting for testing
@@ -233,4 +236,52 @@ int TickFct_RPiSM(int RPiSM_State){
       break;
   }
   return RPiSM_State;
+}
+
+int TickFct_OccupancySM(int OccupancySM_State){
+  int msg = 0;
+  switch(OccupancySM_State){
+    case OccupancySM_Start:
+      if(!msgQ.empty() || !msgQRPi.empty()){
+        OccupancySM_State = OccupancySM_Update;
+      }else{
+        OccupancySM_State = OccupancySM_Start;
+      }
+      break;
+    case OccupancySM_Update:
+      if(!msgQ.empty() || !msgQRPi.empty()){
+        OccupancySM_State = OccupancySM_Update;
+      }else{
+        if(occupancy >= MAX_OCCUPANCY){
+          isMaxOccu = true;
+          LCD.clear();
+          LCD.print("Max occupancy!");
+        }else{
+          isMaxOccu = false;
+          LCD.clear();
+          LCD.print("Occupancy: " + String(occupancy));
+        }
+        OccupancySM_State = OccupancySM_Start;
+      }
+      break;
+    default:
+      OccupancySM_State = OccupancySM_Start;
+      break;
+  }
+  switch(OccupancySM_State){
+    case OccupancySM_Update:
+      if(!msgQ.empty()){
+        msg = msgQ.dequeue();
+        occupancy += msg;
+      }
+      if(!msgQRPi.empty()){
+        msg = msgQRPi.dequeue();
+        occupancy += msg;
+      }
+      break;
+    default:
+      break;
+  }
+
+  return OccupancySM_State;
 }
