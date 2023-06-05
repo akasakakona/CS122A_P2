@@ -34,8 +34,8 @@ int TickFct_NotifSM(int NotifSM_State); //DONE! Waiting for testing
 int TickFct_RPiSM(int RPiSM_State); //DONE! Waiting for testing
 int TickFct_OccupancySM(int OccupancySM_State); //DONE! Waiting for testing
 int TickFct_MotionSM(int MotionSM_State); //DONE! Waiting for testing
-int TickFct_LEDSM(int LightSM_State); //TODO: Implement this!
-int TickFct_BBSM(int BBSM_State); //TODO: Implement this!
+int TickFct_LEDSM(int LightSM_State); //DONE! Waiting for testing
+int TickFct_BBSM(int BBSM_State); //DONE! Waiting for testing
 
 void setup() {
   Serial.begin(9600); //for serial debugging
@@ -312,4 +312,44 @@ int TickFct_LEDSM(int LEDSM_State){
       break;
   }
   return LEDSM_State;
+}
+
+int TickFct_BBSM(int BBSM_State){
+  switch (BBSM_State){
+    case BBSM_Start:
+      if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
+        BBSM_State = BBSM_BB1;
+      }else if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
+        BBSM_State = BBSM_BB2;
+      }else{
+        BBSM_State = BBSM_Start;
+      }
+      break;
+    case BBSM_BB1:
+      if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
+        BBSM_State = BBSM_BB1;
+      }else if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
+        msgQ.enqueue(1);
+        BBSM_State = BBSM_BB2;
+      }else{
+        BBSM_State = BBSM_Start;
+      }
+      break;
+    case BBSM_BB2:
+      if(digitalRead(11) == HIGH && digitalRead(12) == LOW){
+        BBSM_State = BBSM_BB2;
+      }else if(digitalRead(11) == LOW && digitalRead(12) == HIGH){
+        msgQ.enqueue(-1);
+        BBSM_State = BBSM_BB1;
+      }else{
+        BBSM_State = BBSM_Start;
+      }
+      break;
+    default:
+      BBSM_State = BBSM_Start;
+      break;
+  }
+  //no need for second switch statement
+  //since nothing is done within the states
+  return BBSM_State;
 }
