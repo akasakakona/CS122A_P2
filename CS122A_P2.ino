@@ -31,8 +31,8 @@ enum BBSM_States {BBSM_Start, BBSM_BB1, BBSM_BB2};
 
 int TickFct_MicSM(int MicSM_State); //DONE! Waiting for testing
 int TickFct_NotifSM(int NotifSM_State); //DONE! Waiting for testing
-int TickFct_RPiSM(int RPiSM_State); //TODO: Implement this!
-int TickFct_OccupancySM(int OccupancySM_State); //TODO: Implement this!
+int TickFct_RPiSM(int RPiSM_State); //DONE! Waiting for testing
+int TickFct_OccupancySM(int OccupancySM_State); //DONE! Waiting for testing
 int TickFct_MotionSM(int MotionSM_State); //DONE! Waiting for testing
 int TickFct_LEDSM(int LightSM_State); //TODO: Implement this!
 int TickFct_BBSM(int BBSM_State); //TODO: Implement this!
@@ -47,7 +47,7 @@ void setup() {
   //NOTE: Pullup resistors NEEDED for breakbeam to work!
   pinMode(11, INPUT_PULLUP); //for breakbeam sensor 1
   pinMode(12, INPUT_PULLUP); //for breakbeam sensor 2
-  digitalWrite(9, LOW);
+  digitalWrite(9, LOW); //turn off LED
   
   LCD.begin(); //LCD Setup
   LCD.setBacklight(HIGH);
@@ -110,35 +110,6 @@ int TickFct_MicSM(int MicSM_State){
       break;
   }
   return MicSM_State;
-}
-
-int TickFct_MotionSM(int MotionSM_State){
-  switch(MotionSM_State){
-    case MotionSM_Start:
-      MotionSM_State = MotionSM_Detection;
-      break;
-    case MotionSM_Detection:
-      if(digitalRead(10) == HIGH){
-        isMotion = true;
-        MotionSM_State = MotionSM_SetResult;
-      }else{
-        MotionSM_State = MotionSM_Detection;
-      }
-      break;
-    case MotionSM_SetResult:
-      if(digitalRead(10) == LOW){
-        isMotion = false;
-        MotionSM_State = MotionSM_Detection;
-      }else{
-        MotionSM_State = MotionSM_SetResult;
-      }
-    default:
-      MotionSM_State = MotionSM_Start;
-      break;
-  }
-  // no need for second switch statement
-  // since nothing is done within the states
-  return MotionSM_State;
 }
 
 int TickFct_NotifSM(int NotifSM_State){
@@ -284,4 +255,61 @@ int TickFct_OccupancySM(int OccupancySM_State){
   }
 
   return OccupancySM_State;
+}
+
+int TickFct_MotionSM(int MotionSM_State){
+  switch(MotionSM_State){
+    case MotionSM_Start:
+      MotionSM_State = MotionSM_Detection;
+      break;
+    case MotionSM_Detection:
+      if(digitalRead(10) == HIGH){
+        isMotion = true;
+        MotionSM_State = MotionSM_SetResult;
+      }else{
+        MotionSM_State = MotionSM_Detection;
+      }
+      break;
+    case MotionSM_SetResult:
+      if(digitalRead(10) == LOW){
+        isMotion = false;
+        MotionSM_State = MotionSM_Detection;
+      }else{
+        MotionSM_State = MotionSM_SetResult;
+      }
+    default:
+      MotionSM_State = MotionSM_Start;
+      break;
+  }
+  // no need for second switch statement
+  // since nothing is done within the states
+  return MotionSM_State;
+}
+
+int TickFct_LEDSM(int LEDSM_State){
+  static unsigned timer = 0;
+  switch(LEDSM_State){
+    case LEDSM_Start:
+      LEDSM_State = LEDSM_Start;
+      if(isMotion){
+        timer = 50;
+      }
+      break;
+    default:
+      LEDSM_State = LEDSM_Start;
+      break;
+  }
+  switch(LEDSM_State){
+    case LEDSM_Start:
+      if(timer <= 0 || occupancy == 0){
+        digitalWrite(9, LOW);
+      }else{
+        digitalWrite(9, HIGH);
+        timer--;
+      }
+      break;
+    default:
+      break;
+  }
+  return LEDSM_State;
 }
