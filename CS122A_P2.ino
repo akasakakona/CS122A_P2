@@ -24,6 +24,7 @@ Queue<int> msgQRPi;
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
 enum NotifSM_States {NotifSM_Start, NotifSM_Wait, NotifSM_Sound};
+enum RPiSM_States {RPiSM_Start};
 
 int TickFct_MicSM(int MicSM_State); //DONE! Waiting for testing
 int TickFct_NotifSM(int NotifSM_State); //DONE! Waiting for testing
@@ -203,4 +204,33 @@ int TickFct_NotifSM(int NotifSM_State){
       break;
   }
   return NotifSM_State;
+}
+
+int TickFct_RPiSM(int RPiSM_State){
+  String msg = "";
+  switch(RPiSM_State){
+    case RPiSM_Start:
+      RPiSM_State = RPiSM_Start;
+      break;
+    default:
+      RPiSM_State = RPiSM_Start;
+      break;
+  }
+  switch(RPiSM_State){
+    case RPiSM_Start:
+      if(Serial.available()){
+        msg = Serial.readString();
+        if(msg == "1"){
+          msgQRPi.enqueue(1);
+        }else if(msg == "-1"){
+          msgQRPi.enqueue(-1);
+        }else{
+          Serial.println("Invalid message received from RPi!");
+        }
+      }
+      break;
+    default:
+      break;
+  }
+  return RPiSM_State;
 }
