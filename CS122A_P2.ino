@@ -21,6 +21,11 @@ bool isMotion = false;
 Queue<int> msgQ;
 Queue<int> msgQRPi;
 
+//Task Scheduler Data Structure
+task tasks[7];
+const unsigned short tasksNum = 7;
+const unsigned long tasksPeriodGCD = 50;
+
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
 enum NotifSM_States {NotifSM_Start, NotifSM_Wait, NotifSM_Sound};
@@ -53,6 +58,52 @@ void setup() {
   LCD.setBacklight(HIGH);
   LCD.setCursor(0, 0);
   LCD.print("Hello World!");
+
+  //initialize tasks
+  unsigned char i = 0;
+  tasks[i].state = MicSM_Start;
+  tasks[i].period = 50;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_MicSM;
+
+  i++;
+  tasks[i].state = NotifSM_Start;
+  tasks[i].period = 500;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_NotifSM;
+
+  i++;
+  tasks[i].state = RPiSM_Start;
+  tasks[i].period = 50;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_RPiSM;
+
+  i++;
+  tasks[i].state = OccupancySM_Start;
+  tasks[i].period = 100;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_OccupancySM;
+
+  i++;
+  tasks[i].state = MotionSM_Start;
+  tasks[i].period = 500;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_MotionSM;
+
+  i++;
+  tasks[i].state = LEDSM_Start;
+  tasks[i].period = 100;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_LEDSM;
+
+  i++;
+  tasks[i].state = BBSM_Start;
+  tasks[i].period = 100;
+  tasks[i].elapsedTime = tasks[i].period;
+  tasks[i].TickFct = &TickFct_BBSM;
+
+  TimerSet(tasksPeriodGCD);
+  TimerOn();
 }
 
 void loop() {
