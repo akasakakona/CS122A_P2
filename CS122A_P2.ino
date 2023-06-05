@@ -440,5 +440,6 @@ int TickFct_BBSM(int BBSM_State){
 
 /****
  * TODO:
- * - Fine tune motion sensor
+ * - More testing on other components
+ * - Looking into Raspberry Pi serial communication
 */
