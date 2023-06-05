@@ -107,13 +107,13 @@ void setup() {
 }
 
 void loop() {
-  // if(digitalRead(11) == LOW){
-  //   Serial.println("BB1 Broken!");
-  // }
-  // if(digitalRead(12) == LOW){
-  //   Serial.println("BB2 Broken!");
-  // }
-  // delay(500);
+  for(unsigned i = 0; i < tasksNum; i++){
+    if(tasks[i].elapsedTime >= tasks[i].period){
+      tasks[i].state = tasks[i].TickFct(tasks[i].state);
+      tasks[i].elapsedTime = 0;
+    }
+    tasks[i].elapsedTime += tasksPeriodGCD;
+  }
 }
 
 int TickFct_MicSM(int MicSM_State){
