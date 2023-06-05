@@ -23,12 +23,13 @@ Queue<int> msgQRPi;
 
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
+enum NotifSM_States {NotifSM_Start, NotifSM_Wait, NotifSM_Sound};
 
-int TickFct_MicSM(int MicSM_State); //DONE!
-int TickFct_NotifSM(int NotifSM_State); //TODO: Implement this!
+int TickFct_MicSM(int MicSM_State); //DONE! Waiting for testing
+int TickFct_NotifSM(int NotifSM_State); //DONE! Waiting for testing
 int TickFct_RPiSM(int RPiSM_State); //TODO: Implement this!
 int TickFct_OccupancySM(int OccupancySM_State); //TODO: Implement this!
-int TickFct_MotionSM(int MotionSM_State); //DONE!
+int TickFct_MotionSM(int MotionSM_State); //DONE! Waiting for testing
 int TickFct_LEDSM(int LightSM_State); //TODO: Implement this!
 int TickFct_BBSM(int BBSM_State); //TODO: Implement this!
 
@@ -104,6 +105,7 @@ int TickFct_MicSM(int MicSM_State){
       }
       break;
   }
+  return MicSM_State;
 }
 
 int TickFct_MotionSM(int MotionSM_State){
@@ -132,4 +134,73 @@ int TickFct_MotionSM(int MotionSM_State){
   }
   // no need for second switch statement
   // since nothing is done within the states
+  return MotionSM_State;
+}
+
+int TickFct_NotifSM(int NotifSM_State){
+  static unsigned i = 0;
+  static bool ringBuzzer = false;
+  switch(NotifSM_State){
+    case NotifSM_Start:
+      //isNoise takes priority over isMaxOccu
+      if(isNoise){
+        i = 0;
+        LCD.clear();
+        LCD.print("Noise detected!");
+        LCD.setCursor(0, 1);
+        LCD.print("Push btn to stop");
+        LCD.setCursor(0, 0);
+        NotifSM_State = NotifSM_Wait;
+      }else if(isMaxOccu){
+        i = 0;
+        LCD.clear();
+        LCD.print("Max occupancy!");
+        NotifSM_State = NotifSM_Sound;
+      }
+      else{
+        NotifSM_State = NotifSM_Start;
+      }
+      break;
+    case NotifSM_Wait:
+      if(digitalRead(7) == LOW && i < 50){
+        NotifSM_State = NotifSM_Wait;
+      }
+      else if(digitalRead(7) == LOW && i >= 50){
+        i = 0;
+        ringBuzzer = false;
+        NotifSM_State = NotifSM_Sound;
+      }
+      if(digitalRead(7) == HIGH){
+        i = 0;
+        isNoise = false;
+        NotifSM_State = NotifSM_Start;
+      }
+      break;
+    case NotifSM_Sound:
+      if(i < 50){
+        NotifSM_State = NotifSM_Sound;
+      }else{
+        i = 0;
+        NotifSM_State = NotifSM_Start;
+      }
+      break;
+    default:
+      NotifSM_State = NotifSM_Start;
+      break;
+  }
+  switch(NotifSM_State){
+    case NotifSM_Wait:
+      i++;
+      break;
+    case NotifSM_Sound:
+      ringBuzzer = !ringBuzzer;
+      if(ringBuzzer){
+        tone(8, 1000);
+      }
+      i++;
+      break;
+    default:
+      break;
+  }
+  return NotifSM_State;
 }
