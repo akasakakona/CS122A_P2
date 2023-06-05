@@ -28,7 +28,7 @@ const unsigned long tasksPeriodGCD = 50;
 
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
-enum NotifSM_States {NotifSM_Start, NotifSM_Sound};
+enum NotifSM_States {NotifSM_Start, NotifSM_Sound, NotifSM_maxOccu};
 enum RPiSM_States {RPiSM_Start};
 enum OccupancySM_States {OccupancySM_Start, OccupancySM_Update};
 enum LEDSM_States {LEDSM_Start};
@@ -160,7 +160,7 @@ int TickFct_MicSM(int MicSM_State){
     case MicSM_SetResult:
       noise = ((maxNoise - minNoise) * 5) / 1024;
       // Serial.println("Noise: " + String(noise));
-      if(noise){
+      if(noise > 2){
         isNoise = true;
       }
       break;
@@ -171,38 +171,46 @@ int TickFct_MicSM(int MicSM_State){
 }
 
 int TickFct_NotifSM(int NotifSM_State){
-  static unsigned i = 0;
   static bool ringBuzzer = false;
   switch(NotifSM_State){
     case NotifSM_Start:
       //isNoise takes priority over isMaxOccu
       if(isNoise){
-        i = 0;
+        Serial.println("Noise Detected!");
         LCD.clear();
         LCD.print("Noise detected!");
         LCD.setCursor(0, 1);
         LCD.print("Push btn to stop");
         LCD.setCursor(0, 0);
+        ringBuzzer = false;
         NotifSM_State = NotifSM_Sound;
       }else if(isMaxOccu){
-        i = 0;
         LCD.clear();
         LCD.print("Max occupancy!");
-        NotifSM_State = NotifSM_Sound;
+        ringBuzzer = false;
+        NotifSM_State = NotifSM_maxOccu;
       }
       else{
         NotifSM_State = NotifSM_Start;
       }
       break;
     case NotifSM_Sound:
-      if(i < 50){
-        NotifSM_State = NotifSM_Sound;
-      }
-      if((digitalRead(7) == HIGH || i >= 50) && !isMaxOccu){
-        i = 0;
+      if(digitalRead(7) == HIGH){
         noTone(8);
         isNoise = false;
+        LCD.clear();
+        LCD.print("Occupancy: " + String(occupancy));
         NotifSM_State = NotifSM_Start;
+      }
+      break;
+    case NotifSM_maxOccu:
+      if(!isMaxOccu){
+        LCD.clear();
+        LCD.print("Occupancy: " + String(occupancy));
+        noTone(8);
+        NotifSM_State = NotifSM_Start;
+      }else{
+        NotifSM_State = NotifSM_maxOccu;
       }
       break;
     default:
@@ -217,7 +225,9 @@ int TickFct_NotifSM(int NotifSM_State){
       }else{
         noTone(8);
       }
-      i++;
+      break;
+    case NotifSM_maxOccu:
+      tone(8, 1000);
       break;
     default:
       break;
@@ -317,6 +327,7 @@ int TickFct_MotionSM(int MotionSM_State){
       break;
     case MotionSM_SetResult:
       if(digitalRead(10) == LOW){
+        Serial.println("Motion Ended.");
         isMotion = false;
         MotionSM_State = MotionSM_Detection;
       }else{
@@ -415,6 +426,5 @@ int TickFct_BBSM(int BBSM_State){
 
 /****
  * TODO:
- * 2. Stop buzzer when max occupancy is no longer reached
- * 3. Investigate why microphone is not working
+ * - Fine tune motion sensor
 */
