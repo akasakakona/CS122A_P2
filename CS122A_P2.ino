@@ -86,7 +86,7 @@ void setup() {
 
   i++;
   tasks[i].state = MotionSM_Start;
-  tasks[i].period = 1000;
+  tasks[i].period = 100;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_MotionSM;
 
@@ -190,6 +190,9 @@ int TickFct_NotifSM(int NotifSM_State){
       }else if(isMaxOccu){
         LCD.clear();
         LCD.print("Max occupancy!");
+        LCD.setCursor(0, 1);
+        LCD.print(String(occupancy - MAX_OCCUPANCY) + " ppl must exit");
+        LCD.setCursor(0, 0);
         ringBuzzer = false;
         NotifSM_State = NotifSM_maxOccu;
       }
@@ -284,10 +287,13 @@ int TickFct_OccupancySM(int OccupancySM_State){
       if(!msgQ.empty() || !msgQRPi.empty()){
         OccupancySM_State = OccupancySM_Update;
       }else{
-        if(occupancy >= MAX_OCCUPANCY){
+        if(occupancy > MAX_OCCUPANCY){
           isMaxOccu = true;
           LCD.clear();
           LCD.print("Max occupancy!");
+          LCD.setCursor(0, 1);
+          LCD.print(String(occupancy - MAX_OCCUPANCY) + " ppl must exit");
+          LCD.setCursor(0, 0);
         }else{
           isMaxOccu = false;
           LCD.clear();
@@ -310,6 +316,7 @@ int TickFct_OccupancySM(int OccupancySM_State){
         msg = msgQRPi.dequeue();
         occupancy += msg;
       }
+      occupancy = occupancy < 0 ? 0 : occupancy;
       break;
     default:
       break;
@@ -340,6 +347,7 @@ int TickFct_MotionSM(int MotionSM_State){
       }else{
         MotionSM_State = MotionSM_SetResult;
       }
+      break;
     default:
       MotionSM_State = MotionSM_Start;
       break;
@@ -355,7 +363,7 @@ int TickFct_LEDSM(int LEDSM_State){
     case LEDSM_Start:
       LEDSM_State = LEDSM_Start;
       if(isMotion){
-        timer = 50;
+        timer = 100;
       }
       break;
     default:

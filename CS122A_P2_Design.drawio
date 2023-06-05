@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-06-05T11:20:55.822Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="m-g4olBiT5uCg7npA4Zf" version="21.2.8" type="device" pages="2">
+<mxfile host="Electron" modified="2023-06-05T11:45:40.640Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="Z7GhHH7ICJIaLTPlkdgZ" version="21.2.8" type="device" pages="2">
   <diagram name="State Machines" id="3Fu2tHPmSElFfZQrRwX7">
-    <mxGraphModel dx="909" dy="1742" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1004" dy="1809" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -14,7 +14,7 @@
           <mxGeometry x="110" y="970" width="890" height="500" as="geometry" />
         </mxCell>
         <mxCell id="o839yOLEN_f2s1I2kFfj-6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1680" y="440" width="660" height="380" as="geometry" />
+          <mxGeometry x="1680" y="470" width="720" height="408" as="geometry" />
         </mxCell>
         <mxCell id="Dv5pIiwYniil5ABrM-eD-34" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="120" y="290" width="337.5" height="300" as="geometry" />
@@ -332,8 +332,8 @@
         <mxCell id="RcwFCMAtQ21KHjXICten-47" value="&lt;b&gt;&lt;u&gt;LEDSM&lt;/u&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1040" y="597" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="RcwFCMAtQ21KHjXICten-49" value="/ if(isMotion) timer = 50;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1075" y="658" width="150" height="30" as="geometry" />
+        <mxCell id="RcwFCMAtQ21KHjXICten-49" value="/ if(isMotion) timer = 100;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="1070" y="658" width="160" height="30" as="geometry" />
         </mxCell>
         <mxCell id="RcwFCMAtQ21KHjXICten-50" value="&lt;b&gt;&lt;u&gt;NotifSM&lt;/u&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="880" y="-90" width="60" height="30" as="geometry" />
@@ -393,8 +393,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="RcwFCMAtQ21KHjXICten-66" value="isMaxOccu&lt;br&gt;/ ringBuzzer = false;&lt;br&gt;LCD.clear();&lt;br&gt;LCD.display(&quot;Max Occupancy!);" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="990" y="120" width="190" height="70" as="geometry" />
+        <mxCell id="RcwFCMAtQ21KHjXICten-66" value="isMaxOccu&lt;br&gt;/ ringBuzzer = false;&lt;br&gt;LCD.clear();&lt;br&gt;LCD.display(&quot;Max Occupancy!&quot; + String(occupancy - MAX_OCCUPANCY) + &quot;ppl must exit&quot;);" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="955" y="180" width="520" height="70" as="geometry" />
         </mxCell>
         <mxCell id="RcwFCMAtQ21KHjXICten-68" value="other" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1775" y="520" width="50" height="30" as="geometry" />
@@ -402,14 +402,14 @@
         <mxCell id="RcwFCMAtQ21KHjXICten-69" value="!msgQ.empty() || !msgQRPi.empty()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1895" y="577" width="210" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="RcwFCMAtQ21KHjXICten-70" value="other&lt;br&gt;/&amp;nbsp;&lt;br&gt;if(occupancy &amp;gt;= MAX_OCCUPANCY){&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;isMaxOccu = true;&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;LCD.clear();&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;LCD.display(&quot;Max occupancy!&quot;);&lt;br&gt;}else{&lt;br&gt;&amp;nbsp;isMaxOccu = false&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;LCD.clear();&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;LCD.print(&quot;Occupancy:&amp;nbsp; &quot; + String(occupancy));&lt;br&gt;}" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1860" y="635" width="280" height="170" as="geometry" />
+        <mxCell id="RcwFCMAtQ21KHjXICten-70" value="other&lt;br&gt;/&amp;nbsp;&lt;br&gt;if(occupancy &amp;gt;= MAX_OCCUPANCY){&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;isMaxOccu = true;&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;LCD.clear();&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;LCD.display(&quot;Max occupancy!&quot;);&lt;br&gt;tmp = MAX_OCCUPANCY - occupancy;&lt;br&gt;LCD.display(String(tmp) + &quot;people must exit!&quot;);&lt;br&gt;}else{&lt;br&gt;&amp;nbsp;isMaxOccu = false&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;LCD.clear();&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;LCD.print(&quot;Occupancy:&amp;nbsp; &quot; + String(occupancy));&lt;br&gt;}" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="1855" y="655" width="270" height="200" as="geometry" />
         </mxCell>
         <mxCell id="RcwFCMAtQ21KHjXICten-71" value="!msgQ.empty() || !msgQRPi.empty()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="2095" y="520" width="210" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="RcwFCMAtQ21KHjXICten-72" value="if(msgQ.empty()){&lt;br&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;msg = msgQ.dequeue();&lt;/span&gt;&lt;br&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;occupancy += msg;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;}&lt;br&gt;if(msgQRPi.empty()){&lt;br&gt;&lt;div&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;msg = msgQ.dequeue();&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt; &lt;/span&gt;occupancy&amp;nbsp;+= msg;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;}&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="2135" y="652" width="160" height="130" as="geometry" />
+        <mxCell id="RcwFCMAtQ21KHjXICten-72" value="if(msgQ.empty()){&lt;br&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;msg = msgQ.dequeue();&lt;/span&gt;&lt;br&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;occupancy += msg;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;}&lt;br&gt;if(msgQRPi.empty()){&lt;br&gt;&lt;div&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;msg = msgQ.dequeue();&lt;br&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;/span&gt;&lt;span style=&quot;&quot;&gt; &lt;/span&gt;occupancy&amp;nbsp;+= msg;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;}&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;occupancy = occupancy &amp;lt; 0 ? 0 : occupancy&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="2135" y="647" width="260" height="140" as="geometry" />
         </mxCell>
         <mxCell id="RcwFCMAtQ21KHjXICten-74" value="ringBuzzer = !ringBuzzer;&lt;br&gt;if(ringBuzzer){&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;tone(8, 500);&lt;br&gt;}else{&lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;noTone(8);&lt;br&gt;}" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1625" y="40" width="160" height="100" as="geometry" />
@@ -427,13 +427,13 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="o839yOLEN_f2s1I2kFfj-9" value="isMaxOccu" style="whiteSpace=wrap;html=1;fillColor=none;rounded=1;" parent="1" vertex="1">
-          <mxGeometry x="1950" y="90" width="120" height="60" as="geometry" />
+          <mxGeometry x="1980" y="90" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="YJO8ka9hiRt2IvNKQ23o-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="YJO8ka9hiRt2IvNKQ23o-3" target="RcwFCMAtQ21KHjXICten-46" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="YJO8ka9hiRt2IvNKQ23o-3" value="occupancy" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="1440" y="610" width="87" height="40" as="geometry" />
+          <mxGeometry x="1440" y="652" width="87" height="40" as="geometry" />
         </mxCell>
         <mxCell id="S73jbB0KrbIs8h3n_-sC-1" value="Period: 1000ms" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="133" y="675" width="110" height="30" as="geometry" />
@@ -499,13 +499,13 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="27bhIKVXgoMDS7MVKz2C-29" value="maxOccu" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="1285" y="240" width="80" height="80" as="geometry" />
+          <mxGeometry x="1475" y="240" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="27bhIKVXgoMDS7MVKz2C-32" value="!isMaxOccu /&lt;br&gt;isNoise = false;&lt;br&gt;noTone(8);" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="1060" y="230" width="110" height="60" as="geometry" />
+          <mxGeometry x="1060" y="276" width="110" height="60" as="geometry" />
         </mxCell>
         <mxCell id="27bhIKVXgoMDS7MVKz2C-33" value="tone(8, 1000)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1360" y="265" width="90" height="30" as="geometry" />
+          <mxGeometry x="1570" y="265" width="90" height="30" as="geometry" />
         </mxCell>
         <mxCell id="27bhIKVXgoMDS7MVKz2C-34" value="Period: 50ms" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="158" y="320" width="90" height="30" as="geometry" />
