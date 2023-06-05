@@ -14,8 +14,9 @@ int noiseCnt = 0;
 //LCD Address: 0x27, 16 columns, 2 rows
 LiquidCrystal_I2C LCD(0x27, 16, 2);
 const int MAX_OCCUPANCY = 5;
+int occupancy = 0;
 bool isNoise = false;
-bool isOccupied = false;
+bool isMaxOccu = false;
 bool isMotion = false;
 Queue<int> msgQ;
 Queue<int> msgQRPi;
@@ -23,7 +24,43 @@ Queue<int> msgQRPi;
 enum MicSM_States {MicSM_Start, MicSM_Detection, MicSM_SetResult};
 enum MotionSM_States {MotionSM_Start, MotionSM_Detection, MotionSM_SetResult};
 
-void TickFct_MicSM(int MicSM_State){
+int TickFct_MicSM(int MicSM_State); //DONE!
+int TickFct_NotifSM(int NotifSM_State); //TODO: Implement this!
+int TickFct_RPiSM(int RPiSM_State); //TODO: Implement this!
+int TickFct_OccupancySM(int OccupancySM_State); //TODO: Implement this!
+int TickFct_MotionSM(int MotionSM_State); //DONE!
+int TickFct_LEDSM(int LightSM_State); //TODO: Implement this!
+int TickFct_BBSM(int BBSM_State); //TODO: Implement this!
+
+void setup() {
+  Serial.begin(9600); //for serial debugging
+  pinMode(A0, INPUT); //for microphone
+  pinMode(7, INPUT_PULLUP); //for button
+  pinMode(8, OUTPUT); //for buzzer
+  pinMode(9, OUTPUT); //for LED
+  pinMode(10, INPUT_PULLUP); //for PIR Motion Sensor
+  //NOTE: Pullup resistors NEEDED for breakbeam to work!
+  pinMode(11, INPUT_PULLUP); //for breakbeam sensor 1
+  pinMode(12, INPUT_PULLUP); //for breakbeam sensor 2
+  digitalWrite(9, LOW);
+  
+  LCD.begin(); //LCD Setup
+  LCD.setBacklight(HIGH);
+  LCD.setCursor(0, 0);
+  LCD.print("Hello World!");
+}
+
+void loop() {
+  // if(digitalRead(11) == LOW){
+  //   Serial.println("BB1 Broken!");
+  // }
+  // if(digitalRead(12) == LOW){
+  //   Serial.println("BB2 Broken!");
+  // }
+  // delay(500);
+}
+
+int TickFct_MicSM(int MicSM_State){
   static unsigned int maxNoise;
   static unsigned int minNoise;
   static unsigned i;
@@ -69,14 +106,14 @@ void TickFct_MicSM(int MicSM_State){
   }
 }
 
-void TickFct_MotionSM(int MotionSM_State){
+int TickFct_MotionSM(int MotionSM_State){
   switch(MotionSM_State){
     case MotionSM_Start:
       MotionSM_State = MotionSM_Detection;
       break;
     case MotionSM_Detection:
       if(digitalRead(10) == HIGH){
-        isNoise = true;
+        isMotion = true;
         MotionSM_State = MotionSM_SetResult;
       }else{
         MotionSM_State = MotionSM_Detection;
@@ -84,7 +121,7 @@ void TickFct_MotionSM(int MotionSM_State){
       break;
     case MotionSM_SetResult:
       if(digitalRead(10) == LOW){
-        isNoise = false;
+        isMotion = false;
         MotionSM_State = MotionSM_Detection;
       }else{
         MotionSM_State = MotionSM_SetResult;
@@ -93,40 +130,6 @@ void TickFct_MotionSM(int MotionSM_State){
       MotionSM_State = MotionSM_Start;
       break;
   }
-  switch(MotionSM_State){
-    case MotionSM_Detection:
-      break;
-    case MotionSM_SetResult:
-      break;
-    default:
-      break;
-  }
-}
-
-void setup() {
-  Serial.begin(9600); //for serial debugging
-  pinMode(A0, INPUT); //for microphone
-  pinMode(7, INPUT_PULLUP); //for button
-  pinMode(8, OUTPUT); //for buzzer
-  pinMode(9, OUTPUT); //for LED
-  pinMode(10, INPUT_PULLUP); //for PIR Motion Sensor
-  //NOTE: Pullup resistors NEEDED for breakbeam to work!
-  pinMode(11, INPUT_PULLUP); //for breakbeam sensor 1
-  pinMode(12, INPUT_PULLUP); //for breakbeam sensor 2
-  digitalWrite(9, LOW);
-  
-  LCD.begin(); //LCD Setup
-  LCD.setBacklight(HIGH);
-  LCD.setCursor(0, 0);
-  LCD.print("Hello World!");
-}
-
-void loop() {
-  // if(digitalRead(11) == LOW){
-  //   Serial.println("BB1 Broken!");
-  // }
-  // if(digitalRead(12) == LOW){
-  //   Serial.println("BB2 Broken!");
-  // }
-  delay(500);
+  // no need for second switch statement
+  // since nothing is done within the states
 }
