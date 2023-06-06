@@ -437,9 +437,3 @@ int TickFct_BBSM(int BBSM_State){
   //since nothing is done within the states
   return BBSM_State;
 }
-
-/****
- * TODO:
- * - More testing on other components
- * - Looking into Raspberry Pi serial communication
-*/
